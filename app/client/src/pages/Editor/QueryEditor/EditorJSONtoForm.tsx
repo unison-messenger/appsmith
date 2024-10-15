@@ -6,17 +6,16 @@ import type { Datasource } from "entities/Datasource";
 import type { Action, QueryAction, SaaSAction } from "entities/Action";
 import { useDispatch, useSelector } from "react-redux";
 import ActionSettings from "pages/Editor/ActionSettings";
-import { Button, Tab, TabPanel, Tabs, TabsList, Tooltip } from "design-system";
+import { Button, Tab, TabPanel, Tabs, TabsList, Tooltip } from "@appsmith/ads";
 import styled from "styled-components";
 import FormRow from "components/editorComponents/FormRow";
 import {
   createMessage,
-  DEBUGGER_RESPONSE,
   DOCUMENTATION,
   DOCUMENTATION_TOOLTIP,
-} from "@appsmith/constants/messages";
+} from "ee/constants/messages";
 import { useParams } from "react-router";
-import type { AppState } from "@appsmith/reducers";
+import type { AppState } from "ee/reducers";
 import { thinScrollbar } from "constants/DefaultTheme";
 import ActionRightPane from "components/editorComponents/ActionRightPane";
 import type { ActionResponse } from "api/ActionAPI";
@@ -24,23 +23,20 @@ import type { Plugin } from "api/PluginApi";
 import type { UIComponentTypes } from "api/PluginApi";
 import { EDITOR_TABS } from "constants/QueryEditorConstants";
 import type { FormEvalOutput } from "reducers/evaluationReducers/formEvaluationReducer";
-import { getQueryPaneConfigSelectedTabIndex } from "selectors/queryPaneSelectors";
-import { setQueryPaneConfigSelectedTabIndex } from "actions/queryPaneActions";
+import {
+  getPluginActionConfigSelectedTab,
+  setPluginActionEditorSelectedTab,
+} from "PluginActionEditor/store";
 import type { SourceEntity } from "entities/AppsmithConsole";
-import { ENTITY_TYPE as SOURCE_ENTITY_TYPE } from "@appsmith/entities/AppsmithConsole/utils";
+import { ENTITY_TYPE as SOURCE_ENTITY_TYPE } from "ee/entities/AppsmithConsole/utils";
 import { DocsLink, openDoc } from "../../../constants/DocumentationLinks";
-import { useFeatureFlag } from "utils/hooks/useFeatureFlag";
-import { FEATURE_FLAG } from "@appsmith/entities/FeatureFlag";
 import { QueryEditorContext } from "./QueryEditorContext";
 import QueryDebuggerTabs from "./QueryDebuggerTabs";
 import useShowSchema from "components/editorComponents/ActionRightPane/useShowSchema";
-import { doesPluginRequireDatasource } from "@appsmith/entities/Engine/actionHelpers";
+import { doesPluginRequireDatasource } from "ee/entities/Engine/actionHelpers";
 import FormRender from "./FormRender";
 import QueryEditorHeader from "./QueryEditorHeader";
-import ActionEditor from "../IDE/EditorPane/components/ActionEditor";
-import QueryResponseTab from "./QueryResponseTab";
-import DatasourceSelector from "./DatasourceSelector";
-import RunHistory from "@appsmith/components/RunHistory";
+import RunHistory from "ee/components/RunHistory";
 
 const QueryFormContainer = styled.form`
   flex: 1;
@@ -155,10 +151,16 @@ interface QueryFormProps {
   actionResponse?: ActionResponse;
   runErrorMessage: string | undefined;
   location: {
+    // TODO: Fix this the next time the file is edited
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state: any;
   };
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   editorConfig?: any;
   formName: string;
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settingConfig: any;
   formData: SaaSAction | QueryAction;
   responseDisplayFormat: { title: string; value: string };
@@ -197,20 +199,18 @@ export function EditorJSONtoForm(props: Props) {
     uiComponent,
   } = props;
 
-  const {
-    actionRightPaneAdditionSections,
-    actionRightPaneBackLink,
-    closeEditorLink,
-    notification,
-  } = useContext(QueryEditorContext);
+  const { actionRightPaneAdditionSections, notification } =
+    useContext(QueryEditorContext);
 
-  const params = useParams<{ apiId?: string; queryId?: string }>();
+  const params = useParams<{ baseApiId?: string; baseQueryId?: string }>();
   // fetch the error count from the store.
   const actions: Action[] = useSelector((state: AppState) =>
     state.entities.actions.map((action) => action.config),
   );
   const currentActionConfig: Action | undefined = actions.find(
-    (action) => action.id === params.apiId || action.id === params.queryId,
+    (action) =>
+      action.baseId === params.baseApiId ||
+      action.baseId === params.baseQueryId,
   );
 
   const pluginRequireDatasource = doesPluginRequireDatasource(plugin);
@@ -218,10 +218,6 @@ export function EditorJSONtoForm(props: Props) {
   const showSchema =
     useShowSchema(currentActionConfig?.pluginId || "") &&
     pluginRequireDatasource;
-
-  const isActionRedesignEnabled = useFeatureFlag(
-    FEATURE_FLAG.release_actions_redesign_enabled,
-  );
 
   const dispatch = useDispatch();
 
@@ -236,11 +232,14 @@ export function EditorJSONtoForm(props: Props) {
     id: currentActionConfig ? currentActionConfig.id : "",
   };
 
-  const selectedConfigTab = useSelector(getQueryPaneConfigSelectedTabIndex);
+  const selectedTab = useSelector(getPluginActionConfigSelectedTab);
 
-  const setSelectedConfigTab = useCallback((selectedIndex: string) => {
-    dispatch(setQueryPaneConfigSelectedTabIndex(selectedIndex));
-  }, []);
+  const setSelectedConfigTab = useCallback(
+    (selectedIndex: string) => {
+      dispatch(setPluginActionEditorSelectedTab(selectedIndex));
+    },
+    [dispatch],
+  );
 
   // when switching between different redux forms, make sure this redux form has been initialized before rendering anything.
   // the initialized prop below comes from redux-form.
@@ -248,162 +247,103 @@ export function EditorJSONtoForm(props: Props) {
     return null;
   }
 
-  if (isActionRedesignEnabled && plugin) {
-    const responseTabs = [];
-    if (currentActionConfig) {
-      responseTabs.push({
-        key: "response",
-        title: createMessage(DEBUGGER_RESPONSE),
-        panelComponent: (
-          <QueryResponseTab
-            actionName={actionName}
-            actionSource={actionSource}
-            currentActionConfig={currentActionConfig}
-            isRunning={isRunning}
-            onRunClick={onRunClick}
-            runErrorMessage={runErrorMessage}
-          />
-        ),
-      });
-    }
-    return (
-      <ActionEditor
-        isRunning={isRunning}
-        onDocsClick={handleDocumentationClick}
-        onRunClick={onRunClick}
-        runOptionsSelector={
-          <DatasourceSelector
-            currentActionConfig={currentActionConfig}
-            dataSources={dataSources}
-            formName={formName}
-            onCreateDatasourceClick={onCreateDatasourceClick}
-            plugin={plugin}
-          />
-        }
-        settingsRender={
-          <SettingsWrapper>
-            <ActionSettings
-              actionSettingsConfig={settingConfig}
-              formName={formName}
-            />
-          </SettingsWrapper>
-        }
-        tabs={responseTabs}
-      >
-        <FormRender
-          editorConfig={editorConfig}
-          formData={props.formData}
-          formEvaluationState={props.formEvaluationState}
-          formName={formName}
-          uiComponent={uiComponent}
-        />
-      </ActionEditor>
-    );
-  }
-
   return (
-    <>
-      {closeEditorLink}
-      <QueryFormContainer onSubmit={handleSubmit(noop)}>
-        <QueryEditorHeader
-          dataSources={dataSources}
-          formName={formName}
-          isRunning={isRunning}
-          onCreateDatasourceClick={onCreateDatasourceClick}
-          onRunClick={onRunClick}
-          plugin={plugin}
-        />
-        {notification && (
-          <StyledNotificationWrapper>{notification}</StyledNotificationWrapper>
-        )}
-        <Wrapper>
-          <div className="flex flex-1 w-full">
-            <SecondaryWrapper>
-              <TabContainerView>
-                <Tabs
-                  onValueChange={setSelectedConfigTab}
-                  value={selectedConfigTab || EDITOR_TABS.QUERY}
+    <QueryFormContainer onSubmit={handleSubmit(noop)}>
+      <QueryEditorHeader
+        dataSources={dataSources}
+        formName={formName}
+        isRunning={isRunning}
+        onCreateDatasourceClick={onCreateDatasourceClick}
+        onRunClick={onRunClick}
+        plugin={plugin}
+      />
+      {notification && (
+        <StyledNotificationWrapper>{notification}</StyledNotificationWrapper>
+      )}
+      <Wrapper>
+        <div className="flex flex-1 w-full">
+          <SecondaryWrapper>
+            <TabContainerView>
+              <Tabs
+                onValueChange={setSelectedConfigTab}
+                value={selectedTab || EDITOR_TABS.QUERY}
+              >
+                <TabsListWrapper>
+                  <TabsList>
+                    <Tab
+                      data-testid={`t--query-editor-` + EDITOR_TABS.QUERY}
+                      value={EDITOR_TABS.QUERY}
+                    >
+                      Query
+                    </Tab>
+                    <Tab
+                      data-testid={`t--query-editor-` + EDITOR_TABS.SETTINGS}
+                      value={EDITOR_TABS.SETTINGS}
+                    >
+                      Settings
+                    </Tab>
+                  </TabsList>
+                </TabsListWrapper>
+                <TabPanelWrapper
+                  className="tab-panel"
+                  value={EDITOR_TABS.QUERY}
                 >
-                  <TabsListWrapper>
-                    <TabsList>
-                      <Tab
-                        data-testid={`t--query-editor-` + EDITOR_TABS.QUERY}
-                        value={EDITOR_TABS.QUERY}
-                      >
-                        Query
-                      </Tab>
-                      <Tab
-                        data-testid={`t--query-editor-` + EDITOR_TABS.SETTINGS}
-                        value={EDITOR_TABS.SETTINGS}
-                      >
-                        Settings
-                      </Tab>
-                    </TabsList>
-                  </TabsListWrapper>
-                  <TabPanelWrapper
-                    className="tab-panel"
-                    value={EDITOR_TABS.QUERY}
+                  <SettingsWrapper
+                    data-testid={`t--action-form-${plugin?.type}`}
                   >
-                    <SettingsWrapper
-                      data-testid={`t--action-form-${plugin?.type}`}
-                    >
-                      <FormRender
-                        editorConfig={editorConfig}
-                        formData={props.formData}
-                        formEvaluationState={props.formEvaluationState}
-                        formName={formName}
-                        uiComponent={uiComponent}
-                      />
-                    </SettingsWrapper>
-                  </TabPanelWrapper>
-                  <TabPanelWrapper value={EDITOR_TABS.SETTINGS}>
-                    <SettingsWrapper>
-                      <ActionSettings
-                        actionSettingsConfig={settingConfig}
-                        formName={formName}
-                      />
-                    </SettingsWrapper>
-                  </TabPanelWrapper>
-                </Tabs>
-                {documentationLink && (
-                  <Tooltip
-                    content={createMessage(DOCUMENTATION_TOOLTIP)}
-                    placement="top"
+                    <FormRender
+                      editorConfig={editorConfig}
+                      formData={props.formData}
+                      formEvaluationState={props.formEvaluationState}
+                      formName={formName}
+                      uiComponent={uiComponent}
+                    />
+                  </SettingsWrapper>
+                </TabPanelWrapper>
+                <TabPanelWrapper value={EDITOR_TABS.SETTINGS}>
+                  <SettingsWrapper>
+                    <ActionSettings
+                      actionSettingsConfig={settingConfig}
+                      formName={formName}
+                    />
+                  </SettingsWrapper>
+                </TabPanelWrapper>
+              </Tabs>
+              {documentationLink && (
+                <Tooltip
+                  content={createMessage(DOCUMENTATION_TOOLTIP)}
+                  placement="top"
+                >
+                  <DocumentationButton
+                    className="t--datasource-documentation-link"
+                    kind="tertiary"
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      handleDocumentationClick();
+                    }}
+                    size="sm"
+                    startIcon="book-line"
                   >
-                    <DocumentationButton
-                      className="t--datasource-documentation-link"
-                      kind="tertiary"
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        handleDocumentationClick();
-                      }}
-                      size="sm"
-                      startIcon="book-line"
-                    >
-                      {createMessage(DOCUMENTATION)}
-                    </DocumentationButton>
-                  </Tooltip>
-                )}
-              </TabContainerView>
-              <QueryDebuggerTabs
-                actionName={actionName}
-                actionResponse={actionResponse}
-                actionSource={actionSource}
-                currentActionConfig={currentActionConfig}
-                isRunning={isRunning}
-                onRunClick={onRunClick}
-                runErrorMessage={runErrorMessage}
-                showSchema={showSchema}
-              />
-              <RunHistory />
-            </SecondaryWrapper>
-          </div>
-          <ActionRightPane
-            actionRightPaneBackLink={actionRightPaneBackLink}
-            additionalSections={actionRightPaneAdditionSections}
-          />
-        </Wrapper>
-      </QueryFormContainer>
-    </>
+                    {createMessage(DOCUMENTATION)}
+                  </DocumentationButton>
+                </Tooltip>
+              )}
+            </TabContainerView>
+            <QueryDebuggerTabs
+              actionName={actionName}
+              actionResponse={actionResponse}
+              actionSource={actionSource}
+              currentActionConfig={currentActionConfig}
+              isRunning={isRunning}
+              onRunClick={onRunClick}
+              runErrorMessage={runErrorMessage}
+              showSchema={showSchema}
+            />
+            <RunHistory />
+          </SecondaryWrapper>
+        </div>
+        <ActionRightPane additionalSections={actionRightPaneAdditionSections} />
+      </Wrapper>
+    </QueryFormContainer>
   );
 }

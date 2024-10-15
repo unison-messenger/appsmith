@@ -7,8 +7,10 @@ import { ThemeProvider } from "styled-components";
 import { unitTestBaseMockStore } from "layoutSystems/common/dropTarget/unitTestUtils";
 import { lightTheme } from "selectors/themeSelectors";
 import { BrowserRouter as Router } from "react-router-dom";
-import { EditorViewMode } from "@appsmith/entities/IDE/constants";
+import { EditorViewMode } from "ee/entities/IDE/constants";
 import "@testing-library/jest-dom/extend-expect";
+import { APIFactory } from "test/factories/Actions/API";
+import { noop } from "lodash";
 
 jest.mock("./EntityBottomTabs", () => ({
   __esModule: true,
@@ -48,7 +50,7 @@ const storeState = {
         errorCount: 0,
       },
     },
-    apiPane: {
+    pluginActionEditor: {
       debugger: {
         open: true,
         responseTabHeight: 200,
@@ -59,6 +61,8 @@ const storeState = {
 };
 
 describe("ApiResponseView", () => {
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let store: any;
 
   beforeEach(() => {
@@ -66,16 +70,20 @@ describe("ApiResponseView", () => {
   });
 
   it("the container should have class select-text to enable the selection of text for user", () => {
+    const Api1 = APIFactory.build({
+      id: "api_id",
+      baseId: "api_base_id",
+      pageId: "pageId",
+    });
     const { container } = render(
       <Provider store={store}>
         <ThemeProvider theme={lightTheme}>
           <Router>
             <ApiResponseView
-              apiName="Api1"
+              currentActionConfig={Api1}
+              disabled={false}
               isRunning={false}
-              onRunClick={() => {}}
-              responseDataTypes={[]}
-              responseDisplayFormat={{ title: "JSON", value: "JSON" }}
+              onRunClick={noop}
             />
           </Router>
         </ThemeProvider>

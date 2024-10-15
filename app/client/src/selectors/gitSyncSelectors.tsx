@@ -1,11 +1,12 @@
-import type { AppState } from "@appsmith/reducers";
+import type { AppState } from "ee/reducers";
 import { createSelector } from "reselect";
 import type { GitSyncReducerState } from "reducers/uiReducers/gitSyncReducer";
 import {
   getCurrentAppGitMetaData,
   getCurrentApplication,
-} from "@appsmith/selectors/applicationSelectors";
+} from "ee/selectors/applicationSelectors";
 import type { Branch } from "entities/GitSync";
+import { selectFeatureFlags } from "ee/selectors/featureFlagsSelectors";
 
 export const getGitSyncState = (state: AppState): GitSyncReducerState =>
   state.ui.gitSync;
@@ -20,6 +21,7 @@ export const getIsDisconnectGitModalOpen = (state: AppState) =>
 
 export const getIsGitRepoSetup = (state: AppState) => {
   const gitMetadata = getCurrentAppGitMetaData(state);
+
   return gitMetadata?.remoteUrl;
 };
 
@@ -118,6 +120,7 @@ export const getFetchingBranches = (state: AppState) =>
 
 export const getCurrentGitBranch = (state: AppState): string | undefined => {
   const { gitApplicationMetadata } = getCurrentApplication(state) || {};
+
   return gitApplicationMetadata?.branchName;
 };
 
@@ -150,6 +153,7 @@ export const getCountOfChangesToCommit = (state: AppState) => {
   } = gitStatus || {};
   const themeCount = modified.includes("theme.json") ? 1 : 0;
   const settingsCount = modified.includes("application.json") ? 1 : 0;
+
   // does not include ahead and behind remote counts
   return (
     modifiedDatasources +
@@ -277,3 +281,8 @@ export const isGitSettingsModalOpenSelector = (state: AppState) =>
 
 export const activeGitSettingsModalTabSelector = (state: AppState) =>
   state.ui.gitSync.activeGitSettingsModalTab;
+
+export const isGitPersistBranchEnabledSelector = createSelector(
+  selectFeatureFlags,
+  (featureFlags) => featureFlags.release_git_persist_branch_enabled ?? false,
+);

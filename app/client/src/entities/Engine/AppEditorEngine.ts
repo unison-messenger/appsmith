@@ -10,17 +10,20 @@ import {
 } from "actions/gitSyncActions";
 import { restoreRecentEntitiesRequest } from "actions/globalSearchActions";
 import { resetEditorSuccess } from "actions/initActions";
-import { fetchAllPageEntityCompletion, setupPage } from "actions/pageActions";
+import {
+  fetchAllPageEntityCompletion,
+  setupPageAction,
+} from "actions/pageActions";
 import {
   executePageLoadActions,
   fetchActions,
 } from "actions/pluginActionActions";
 import { fetchPluginFormConfigs } from "actions/pluginActions";
-import type { ApplicationPayload } from "@appsmith/constants/ReduxActionConstants";
+import type { ApplicationPayload } from "entities/Application";
 import {
   ReduxActionErrorTypes,
   ReduxActionTypes,
-} from "@appsmith/constants/ReduxActionConstants";
+} from "ee/constants/ReduxActionConstants";
 import { addBranchParam } from "constants/routes";
 import type { APP_MODE } from "entities/App";
 import { call, fork, put, select, spawn } from "redux-saga/effects";
@@ -30,13 +33,12 @@ import {
   reportSWStatus,
   waitForWidgetConfigBuild,
 } from "sagas/InitSagas";
-import { getCurrentApplication } from "selectors/editorSelectors";
-import { getCurrentGitBranch } from "selectors/gitSyncSelectors";
-import AnalyticsUtil from "@appsmith/utils/AnalyticsUtil";
+import {
+  getCurrentGitBranch,
+  isGitPersistBranchEnabledSelector,
+} from "selectors/gitSyncSelectors";
+import AnalyticsUtil from "ee/utils/AnalyticsUtil";
 import history from "utils/history";
-import PerformanceTracker, {
-  PerformanceTransactionName,
-} from "utils/PerformanceTracker";
 import type { AppEnginePayload } from ".";
 import AppEngine, {
   ActionsNotFoundError,
@@ -48,26 +50,30 @@ import CodemirrorTernService from "utils/autocomplete/CodemirrorTernService";
 import {
   waitForSegmentInit,
   waitForFetchUserSuccess,
-} from "@appsmith/sagas/userSagas";
+} from "ee/sagas/userSagas";
 import { getFirstTimeUserOnboardingComplete } from "selectors/onboardingSelectors";
-import { isAirgapped } from "@appsmith/utils/airgapHelpers";
-import { getAIPromptTriggered } from "utils/storage";
+import { isAirgapped } from "ee/utils/airgapHelpers";
+import { getAIPromptTriggered, setLatestGitBranchInLocal } from "utils/storage";
 import { trackOpenEditorTabs } from "../../utils/editor/browserTabsTracking";
 import { EditorModes } from "components/editorComponents/CodeEditor/EditorConfig";
-import { waitForFetchEnvironments } from "@appsmith/sagas/EnvironmentSagas";
-import { getPageDependencyActions } from "@appsmith/entities/Engine/actionHelpers";
-import { getCurrentWorkspaceId } from "@appsmith/selectors/selectedWorkspaceSelectors";
+import { waitForFetchEnvironments } from "ee/sagas/EnvironmentSagas";
+import { getPageDependencyActions } from "ee/entities/Engine/actionHelpers";
+import { getCurrentWorkspaceId } from "ee/selectors/selectedWorkspaceSelectors";
 import {
   getFeatureFlagsForEngine,
   type DependentFeatureFlags,
-} from "@appsmith/selectors/engineSelectors";
+} from "ee/selectors/engineSelectors";
 import { fetchJSCollections } from "actions/jsActionActions";
 import {
   fetchAppThemesAction,
   fetchSelectedAppThemeAction,
 } from "actions/appThemingActions";
+import { getCurrentApplication } from "ee/selectors/applicationSelectors";
 import type { Span } from "@opentelemetry/api";
 import { endSpan, startNestedSpan } from "UITelemetry/generateTraces";
+import { getCurrentUser } from "selectors/usersSelectors";
+import type { User } from "constants/userConstants";
+import log from "loglevel";
 
 export default class AppEditorEngine extends AppEngine {
   constructor(mode: APP_MODE) {
@@ -89,6 +95,8 @@ export default class AppEditorEngine extends AppEngine {
    * @param AppEnginePayload
    * @returns
    */
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public *setupEngine(payload: AppEnginePayload, rootSpan: Span): any {
     const editorSetupSpan = startNestedSpan(
       "AppEditorEngine.setupEngine",
@@ -100,18 +108,6 @@ export default class AppEditorEngine extends AppEngine {
     CodemirrorTernService.resetServer();
 
     endSpan(editorSetupSpan);
-  }
-
-  public startPerformanceTracking() {
-    PerformanceTracker.startAsyncTracking(
-      PerformanceTransactionName.INIT_EDIT_APP,
-    );
-  }
-
-  public stopPerformanceTracking() {
-    PerformanceTracker.stopAsyncTracking(
-      PerformanceTransactionName.INIT_EDIT_APP,
-    );
   }
 
   private *loadPageThemesAndActions(
@@ -134,7 +130,7 @@ export default class AppEditorEngine extends AppEngine {
       unpublishedActions,
     } = allResponses;
     const initActionsCalls = [
-      setupPage(toLoadPageId, true, pageWithMigratedDsl),
+      setupPageAction(toLoadPageId, true, pageWithMigratedDsl),
       fetchActions({ applicationId, unpublishedActions }, []),
       fetchJSCollections({ applicationId, unpublishedActionCollections }),
       fetchSelectedAppThemeAction(applicationId, currentTheme),
@@ -176,6 +172,7 @@ export default class AppEditorEngine extends AppEngine {
       "AppEditorEngine.waitForFetchUserSuccess",
       rootSpan,
     );
+
     yield call(waitForFetchUserSuccess);
     endSpan(waitForUserSpan);
 
@@ -183,6 +180,7 @@ export default class AppEditorEngine extends AppEngine {
       "AppEditorEngine.waitForSegmentInit",
       rootSpan,
     );
+
     yield call(waitForSegmentInit, true);
     endSpan(waitForSegmentInitSpan);
 
@@ -190,6 +188,7 @@ export default class AppEditorEngine extends AppEngine {
       "AppEditorEngine.waitForFetchEnvironments",
       rootSpan,
     );
+
     yield call(waitForFetchEnvironments);
     endSpan(waitForFetchEnvironmentsSpan);
 
@@ -250,6 +249,8 @@ export default class AppEditorEngine extends AppEngine {
     applicationId: string,
     allResponses: EditConsolidatedApi,
     rootSpan: Span,
+    // TODO: Fix this the next time the file is edited
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
     yield call(
       this.loadPageThemesAndActions,
@@ -274,6 +275,27 @@ export default class AppEditorEngine extends AppEngine {
       getCurrentApplication,
     );
 
+    const isGitPersistBranchEnabled: boolean = yield select(
+      isGitPersistBranchEnabledSelector,
+    );
+
+    if (isGitPersistBranchEnabled) {
+      const currentUser: User = yield select(getCurrentUser);
+      const currentBranch: string = yield select(getCurrentGitBranch);
+
+      if (currentUser?.email && currentApplication?.baseId && currentBranch) {
+        yield setLatestGitBranchInLocal(
+          currentUser.email,
+          currentApplication.baseId,
+          currentBranch,
+        );
+      } else {
+        log.error(
+          `There was an error setting the latest git branch in local - userEmail: ${!!currentUser?.email}, applicationId: ${currentApplication?.baseId}, branch: ${currentBranch}`,
+        );
+      }
+    }
+
     const [isAnotherEditorTabOpen, currentTabs] = yield call(
       trackOpenEditorTabs,
       currentApplication.id,
@@ -287,6 +309,7 @@ export default class AppEditorEngine extends AppEngine {
         currentTabs,
       });
     }
+
     if (isFirstTimeUserOnboardingComplete) {
       yield put({
         type: ReduxActionTypes.SET_FIRST_TIME_USER_ONBOARDING_APPLICATION_IDS,
@@ -331,6 +354,7 @@ export default class AppEditorEngine extends AppEngine {
     const loadGitSpan = startNestedSpan("AppEditorEngine.loadGit", rootSpan);
 
     const branchInStore: string = yield select(getCurrentGitBranch);
+
     yield put(
       restoreRecentEntitiesRequest({
         applicationId,

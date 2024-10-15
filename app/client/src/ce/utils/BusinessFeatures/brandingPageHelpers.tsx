@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
 import { default as UpgradeBanner_CE } from "ce/pages/AdminSettings/Branding/UpgradeBanner";
-import { default as UpgradeBanner_EE } from "@appsmith/pages/AdminSettings/Branding/UpgradeBanner";
+import { default as UpgradeBanner_EE } from "ee/pages/AdminSettings/Branding/UpgradeBanner";
 import React from "react";
-import { getPageTitle as getPageTitle_CE } from "ce/utils";
-import { getPageTitle as getPageTitle_EE } from "@appsmith/utils";
+import {
+  getHtmlPageTitle as getHtmlPageTitle_CE,
+  getPageTitle as getPageTitle_CE,
+} from "ce/utils";
+import {
+  getHtmlPageTitle as getHtmlPageTitle_EE,
+  getPageTitle as getPageTitle_EE,
+} from "ee/utils";
 
 export const getUpgradeBanner = (isEnabled: boolean) => {
   if (isEnabled) {

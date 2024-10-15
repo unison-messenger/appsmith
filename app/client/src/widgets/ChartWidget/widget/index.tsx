@@ -55,6 +55,7 @@ export const emptyChartData = (props: ChartWidgetProps) => {
         return false;
       }
     }
+
     return true;
   }
 };
@@ -149,6 +150,7 @@ class ChartWidget extends BaseWidget<ChartWidgetProps, WidgetState> {
     return {
       getEditorCallouts(props: WidgetProps): WidgetCallout[] {
         const callouts: WidgetCallout[] = [];
+
         if (props.chartType == "CUSTOM_FUSION_CHART") {
           callouts.push({
             message: messages.customFusionChartDeprecationMessage,
@@ -160,6 +162,7 @@ class ChartWidget extends BaseWidget<ChartWidgetProps, WidgetState> {
             ],
           });
         }
+
         return callouts;
       },
     };
@@ -181,6 +184,8 @@ class ChartWidget extends BaseWidget<ChartWidgetProps, WidgetState> {
     };
   }
 
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static getMetaPropertiesMap(): Record<string, any> {
     return {
       selectedDataPoint: undefined,
@@ -221,42 +226,50 @@ class ChartWidget extends BaseWidget<ChartWidgetProps, WidgetState> {
   getWidgetView() {
     const errors = syntaxErrorsFromProps(this.props);
 
-    if (errors.length == 0) {
-      if (emptyChartData(this.props)) {
-        return <EmptyChartData />;
-      } else {
-        return (
-          <Suspense fallback={<Skeleton />}>
-            <ChartComponent
-              allowScroll={this.props.allowScroll}
-              borderRadius={this.props.borderRadius}
-              boxShadow={this.props.boxShadow}
-              chartData={this.props.chartData}
-              chartName={this.props.chartName}
-              chartType={this.props.chartType}
-              customEChartConfig={this.props.customEChartConfig}
-              customFusionChartConfig={this.props.customFusionChartConfig}
-              dimensions={this.props}
-              fontFamily={ChartWidget.fontFamily}
-              hasOnDataPointClick={Boolean(this.props.onDataPointClick)}
-              isLoading={this.props.isLoading}
-              isVisible={this.props.isVisible}
-              key={this.props.widgetId}
-              labelOrientation={this.props.labelOrientation}
-              onDataPointClick={this.onDataPointClick}
-              primaryColor={this.props.accentColor ?? Colors.ROYAL_BLUE_2}
-              setAdaptiveYMin={this.props.setAdaptiveYMin}
-              showDataPointLabel={this.props.showDataPointLabel}
-              widgetId={this.props.widgetId}
-              xAxisName={this.props.xAxisName}
-              yAxisName={this.props.yAxisName}
-            />
-          </Suspense>
-        );
-      }
-    } else {
+    if (this.props.isLoading) {
+      return this.renderChartWithData();
+    }
+
+    if (errors.length > 0) {
       return <ChartErrorComponent error={errors[0]} />;
     }
+
+    if (emptyChartData(this.props)) {
+      return <EmptyChartData />;
+    }
+
+    return this.renderChartWithData();
+  }
+
+  renderChartWithData() {
+    return (
+      <Suspense fallback={<Skeleton />}>
+        <ChartComponent
+          allowScroll={this.props.allowScroll}
+          borderRadius={this.props.borderRadius}
+          boxShadow={this.props.boxShadow}
+          chartData={this.props.chartData}
+          chartName={this.props.chartName}
+          chartType={this.props.chartType}
+          customEChartConfig={this.props.customEChartConfig}
+          customFusionChartConfig={this.props.customFusionChartConfig}
+          dimensions={this.props}
+          fontFamily={ChartWidget.fontFamily}
+          hasOnDataPointClick={Boolean(this.props.onDataPointClick)}
+          isLoading={this.props.isLoading}
+          isVisible={this.props.isVisible}
+          key={this.props.widgetId}
+          labelOrientation={this.props.labelOrientation}
+          onDataPointClick={this.onDataPointClick}
+          primaryColor={this.props.accentColor ?? Colors.ROYAL_BLUE_2}
+          setAdaptiveYMin={this.props.setAdaptiveYMin}
+          showDataPointLabel={this.props.showDataPointLabel}
+          widgetId={this.props.widgetId}
+          xAxisName={this.props.xAxisName}
+          yAxisName={this.props.yAxisName}
+        />
+      </Suspense>
+    );
   }
 }
 

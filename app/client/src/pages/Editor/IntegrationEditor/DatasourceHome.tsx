@@ -6,32 +6,32 @@ import {
   getDBPlugins,
   getPluginImages,
   getMostPopularPlugins,
-} from "@appsmith/selectors/entitiesSelector";
+} from "ee/selectors/entitiesSelector";
 import type { Plugin } from "api/PluginApi";
-import { DATASOURCE_DB_FORM } from "@appsmith/constants/forms";
+import { DATASOURCE_DB_FORM } from "ee/constants/forms";
 import {
   createDatasourceFromForm,
   createTempDatasourceFromForm,
 } from "actions/datasourceActions";
-import type { AppState } from "@appsmith/reducers";
-import AnalyticsUtil from "@appsmith/utils/AnalyticsUtil";
-import { getCurrentApplication } from "@appsmith/selectors/applicationSelectors";
-import type { ApplicationPayload } from "@appsmith/constants/ReduxActionConstants";
+import type { AppState } from "ee/reducers";
+import AnalyticsUtil from "ee/utils/AnalyticsUtil";
+import { getCurrentApplication } from "ee/selectors/applicationSelectors";
+import type { ApplicationPayload } from "entities/Application";
 import { getQueryParams } from "utils/URLUtils";
-import { getGenerateCRUDEnabledPluginMap } from "@appsmith/selectors/entitiesSelector";
+import { getGenerateCRUDEnabledPluginMap } from "ee/selectors/entitiesSelector";
 import type { GenerateCRUDEnabledPluginMap } from "api/PluginApi";
 import { getIsGeneratePageInitiator } from "utils/GenerateCrudUtil";
-import { getAssetUrl } from "@appsmith/utils/airgapHelpers";
+import { getAssetUrl } from "ee/utils/airgapHelpers";
 import { ApiCard, API_ACTION, CardContentWrapper } from "./NewApi";
 import { PluginPackageName, PluginType } from "entities/Action";
-import { Spinner } from "design-system";
+import { Spinner } from "@appsmith/ads";
 import PlusLogo from "assets/images/Plus-logo.svg";
 import {
   createMessage,
   CREATE_NEW_DATASOURCE_REST_API,
-} from "@appsmith/constants/messages";
-import { createNewApiActionBasedOnEditorType } from "@appsmith/actions/helpers";
-import type { ActionParentEntityTypeInterface } from "@appsmith/entities/Engine/actionHelpers";
+} from "ee/constants/messages";
+import { createNewApiActionBasedOnEditorType } from "ee/actions/helpers";
+import type { ActionParentEntityTypeInterface } from "ee/entities/Engine/actionHelpers";
 import history from "utils/history";
 
 // This function remove the given key from queryParams and return string
@@ -39,6 +39,7 @@ const removeQueryParams = (paramKeysToRemove: Array<string>) => {
   const queryParams = getQueryParams();
   let queryString = "";
   const queryParamKeys = Object.keys(queryParams);
+
   if (queryParamKeys && queryParamKeys.length) {
     queryParamKeys.map((key) => {
       if (!paramKeysToRemove.includes(key)) {
@@ -46,8 +47,10 @@ const removeQueryParams = (paramKeysToRemove: Array<string>) => {
           encodeURIComponent(key) + "=" + encodeURIComponent(queryParams[key]);
       }
     });
+
     return "?" + queryString;
   }
+
   return "";
 };
 
@@ -125,13 +128,21 @@ interface DatasourceHomeScreenProps {
   };
   showMostPopularPlugins?: boolean;
   isCreating?: boolean;
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   showUnsupportedPluginDialog: (callback: any) => void;
   isAirgappedInstance?: boolean;
 }
 
 interface ReduxDispatchProps {
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initializeForm: (data: Record<string, any>) => void;
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createDatasource: (data: any) => void;
+  // TODO: Fix this the next time the file is edited
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createTempDatasource: (data: any) => void;
   createNewApiActionBasedOnEditorType: (
     editorType: string,
@@ -156,6 +167,8 @@ class DatasourceHomeScreen extends React.Component<Props> {
   goToCreateDatasource = (
     pluginId: string,
     pluginName: string,
+    // TODO: Fix this the next time the file is edited
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params?: any,
   ) => {
     const {
@@ -181,17 +194,20 @@ class DatasourceHomeScreen extends React.Component<Props> {
         plugin: pluginName,
         packageName: params?.packageName,
       });
+
       if (!generateCRUDSupportedPlugin[pluginId]) {
         // show modal informing user that this will break the generate flow.
         showUnsupportedPluginDialog(() => {
           const URL =
             window.location.pathname +
             removeQueryParams(["isGeneratePageMode"]);
+
           history.replace(URL);
           this.goToCreateDatasource(pluginId, pluginName, {
             skipValidPluginCheck: true,
           });
         });
+
         return;
       }
     }
@@ -204,6 +220,7 @@ class DatasourceHomeScreen extends React.Component<Props> {
   handleOnClick = () => {
     const { editorId, editorType, parentEntityId, parentEntityType } =
       this.props;
+
     AnalyticsUtil.logEvent("CREATE_DATA_SOURCE_CLICK", {
       source: API_ACTION.CREATE_NEW_API,
     });
@@ -246,6 +263,7 @@ class DatasourceHomeScreen extends React.Component<Props> {
                       {createMessage(CREATE_NEW_DATASOURCE_REST_API)}
                     </p>
                   </CardContentWrapper>
+                  {/*@ts-expect-error Fix this the next time the file is edited*/}
                   {isCreating && <Spinner className="cta" size={25} />}
                 </ApiCard>
               ) : null
@@ -294,6 +312,7 @@ const mapStateToProps = (
           plugin?.packageName !== PluginPackageName.GOOGLE_SHEETS,
       )
     : mostPopularPlugins;
+
   return {
     pluginImages: getPluginImages(state),
     plugins: !!props?.showMostPopularPlugins
@@ -305,11 +324,19 @@ const mapStateToProps = (
   };
 };
 
+// TODO: Fix this the next time the file is edited
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    // TODO: Fix this the next time the file is edited
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initializeForm: (data: Record<string, any>) =>
       dispatch(initialize(DATASOURCE_DB_FORM, data)),
+    // TODO: Fix this the next time the file is edited
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createDatasource: (data: any) => dispatch(createDatasourceFromForm(data)),
+    // TODO: Fix this the next time the file is edited
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createTempDatasource: (data: any) =>
       dispatch(createTempDatasourceFromForm(data)),
     createNewApiActionBasedOnEditorType: (

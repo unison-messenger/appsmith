@@ -7,8 +7,8 @@ import {
   LOGIN_FORM_NAME,
   LOGIN_FORM_EMAIL_FIELD_NAME,
   LOGIN_FORM_PASSWORD_FIELD_NAME,
-} from "@appsmith/constants/forms";
-import { FORGOT_PASSWORD_URL, SETUP } from "constants/routes";
+} from "ee/constants/forms";
+import { FORGOT_PASSWORD_URL, SETUP, SIGN_UP_URL } from "constants/routes";
 import {
   LOGIN_PAGE_TITLE,
   LOGIN_PAGE_EMAIL_INPUT_LABEL,
@@ -24,9 +24,9 @@ import {
   LOGIN_PAGE_INVALID_CREDS_FORGOT_PASSWORD_LINK,
   // NEW_TO_APPSMITH,
   createMessage,
-} from "@appsmith/constants/messages";
-import { FormGroup } from "design-system-old";
-import { Button, Callout } from "design-system";
+} from "ee/constants/messages";
+import { FormGroup } from "@appsmith/ads-old";
+import { Button, Link, Callout } from "@appsmith/ads";
 import FormTextField from "components/utils/ReduxFormTextField";
 // import ThirdPartyAuth from "pages/UserAuth/ThirdPartyAuth";
 import { isEmail, isEmptyString } from "utils/formhelpers";
@@ -37,35 +37,35 @@ import {
   FormActions,
   EmailFormWrapper,
 } from "pages/UserAuth/StyledComponents";
-import AnalyticsUtil from "@appsmith/utils/AnalyticsUtil";
-import { LOGIN_SUBMIT_PATH } from "@appsmith/constants/ApiConstants";
-import PerformanceTracker, {
-  PerformanceTransactionName,
-} from "utils/PerformanceTracker";
+import AnalyticsUtil from "ee/utils/AnalyticsUtil";
+import { LOGIN_SUBMIT_PATH } from "ee/constants/ApiConstants";
 import { getIsSafeRedirectURL } from "utils/helpers";
 import { getCurrentUser } from "selectors/usersSelectors";
 import Container from "pages/UserAuth/Container";
 import {
   // getThirdPartyAuths,
   getIsFormLoginEnabled,
-  // getTenantConfig,
-} from "@appsmith/selectors/tenantSelectors";
-// import Helmet from "react-helmet";
-// import { useFeatureFlag } from "utils/hooks/useFeatureFlag";
-// import { FEATURE_FLAG } from "@appsmith/entities/FeatureFlag";
-// import { getHTMLPageTitle } from "@appsmith/utils/BusinessFeatures/brandingPageHelpers";
-
+  getTenantConfig,
+} from "ee/selectors/tenantSelectors";
+import Helmet from "react-helmet";
+import { useFeatureFlag } from "utils/hooks/useFeatureFlag";
+import { FEATURE_FLAG } from "ee/entities/FeatureFlag";
+import { getHTMLPageTitle } from "ee/utils/BusinessFeatures/brandingPageHelpers";
+import * as Sentry from "@sentry/react";
+import { Severity } from "@sentry/react";
 const validate = (values: LoginFormValues, props: ValidateProps) => {
   const errors: LoginFormValues = {};
   const email = values[LOGIN_FORM_EMAIL_FIELD_NAME] || "";
   const password = values[LOGIN_FORM_PASSWORD_FIELD_NAME];
   const { isPasswordFieldDirty, touch } = props;
+
   if (!password || isEmptyString(password)) {
     isPasswordFieldDirty && touch?.(LOGIN_FORM_PASSWORD_FIELD_NAME);
     errors[LOGIN_FORM_PASSWORD_FIELD_NAME] = createMessage(
       FORM_VALIDATION_EMPTY_PASSWORD,
     );
   }
+
   if (!isEmptyString(email) && !isEmail(email)) {
     touch?.(LOGIN_FORM_EMAIL_FIELD_NAME);
     errors[LOGIN_FORM_EMAIL_FIELD_NAME] = createMessage(
@@ -106,40 +106,53 @@ export function Login(props: LoginFormProps) {
   let showError = false;
   let errorMessage = "";
   const currentUser = useSelector(getCurrentUser);
+
   if (currentUser?.emptyInstance) {
     return <Redirect to={SETUP} />;
   }
+
   if (queryParams.get("error")) {
     errorMessage = queryParams.get("message") || queryParams.get("error") || "";
     showError = true;
+    Sentry.captureException("Login failed", {
+      level: Severity.Error,
+      extra: {
+        error: new Error(errorMessage),
+      },
+    });
   }
+
   let loginURL = "/api/v1/" + LOGIN_SUBMIT_PATH;
   // let signupURL = SIGN_UP_URL;
   const redirectUrl = queryParams.get("redirectUrl");
+
   if (redirectUrl != null && getIsSafeRedirectURL(redirectUrl)) {
     const encodedRedirectUrl = encodeURIComponent(redirectUrl);
+
     loginURL += `?redirectUrl=${encodedRedirectUrl}`;
     // signupURL += `?redirectUrl=${encodedRedirectUrl}`;
   }
 
-  // let forgotPasswordURL = `${FORGOT_PASSWORD_URL}`;
-  // if (props.emailValue && !isEmptyString(props.emailValue)) {
-  //   forgotPasswordURL += `?email=${props.emailValue}`;
-  // }
-  //
-  // const footerSection = isFormLoginEnabled && (
-  //   <div className="px-2 flex align-center justify-center text-center text-[color:var(--ads-v2\-color-fg)] text-[14px]">
-  //     {createMessage(NEW_TO_APPSMITH)}&nbsp;
-  //     <Link
-  //       className="t--sign-up t--signup-link"
-  //       kind="primary"
-  //       target="_self"
-  //       to={signupURL}
-  //     >
-  //       {createMessage(LOGIN_PAGE_SIGN_UP_LINK_TEXT)}
-  //     </Link>
-  //   </div>
-  // );
+
+//  let forgotPasswordURL = `${FORGOT_PASSWORD_URL}`;
+
+  //if (props.emailValue && !isEmptyString(props.emailValue)) {
+    //forgotPasswordURL += `?email=${props.emailValue}`;
+ // }
+
+  //const footerSection = isFormLoginEnabled && (
+   // <div className="px-2 flex align-center justify-center text-center text-[color:var(--ads-v2\-color-fg)] text-[14px]">
+    //  {createMessage(NEW_TO_APPSMITH)}&nbsp;
+     // <Link
+      //  className="t--sign-up t--signup-link"
+       // kind="primary"
+        //target="_self"
+       // to={signupURL}
+      //>
+       // {createMessage(LOGIN_PAGE_SIGN_UP_LINK_TEXT)}
+      //</Link>
+    //</div>
+  //);
 
   return (
     <Container title={createMessage(LOGIN_PAGE_TITLE)}>
@@ -201,9 +214,6 @@ export function Login(props: LoginFormProps) {
                 isDisabled={!isFormValid}
                 kind="primary"
                 onClick={() => {
-                  PerformanceTracker.startTracking(
-                    PerformanceTransactionName.LOGIN_CLICK,
-                  );
                   AnalyticsUtil.logEvent("LOGIN_CLICK", {
                     loginMethod: "EMAIL",
                   });
@@ -230,6 +240,7 @@ export function Login(props: LoginFormProps) {
 }
 
 const selector = formValueSelector(LOGIN_FORM_NAME);
+
 export default connect((state) => ({
   emailValue: selector(state, LOGIN_FORM_EMAIL_FIELD_NAME),
   isPasswordFieldDirty: isDirty(LOGIN_FORM_NAME)(

@@ -1,37 +1,50 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactJson from "react-json-view";
 import {
   apiReactJsonProps,
-  NoResponse,
-  responseTabComponent,
   ResponseTabErrorContainer,
   ResponseTabErrorContent,
   ResponseTabErrorDefaultMessage,
-} from "components/editorComponents/ApiResponseView";
+} from "PluginActionEditor/components/PluginActionResponse/components/ApiResponse";
+import { ResponseFormatTabs } from "PluginActionEditor/components/PluginActionResponse/components/ResponseFormatTabs";
+import { NoResponse } from "PluginActionEditor/components/PluginActionResponse/components/NoResponse";
 import LogAdditionalInfo from "components/editorComponents/Debugger/ErrorLogs/components/LogAdditionalInfo";
 import LogHelper from "components/editorComponents/Debugger/ErrorLogs/components/LogHelper";
 import LOG_TYPE from "entities/AppsmithConsole/logtype";
 import { JsonWrapper } from "components/editorComponents/Debugger/ErrorLogs/components/LogCollapseData";
-import { Callout, Flex, SegmentedControl } from "design-system";
+import {
+  Callout,
+  Flex,
+  SegmentedControl,
+  type CalloutLinkProps,
+} from "@appsmith/ads";
 import styled from "styled-components";
-import { DEBUGGER_TAB_KEYS } from "components/editorComponents/Debugger/helpers";
-import AnalyticsUtil from "@appsmith/utils/AnalyticsUtil";
+import { DEBUGGER_TAB_KEYS } from "components/editorComponents/Debugger/constants";
+import AnalyticsUtil from "ee/utils/AnalyticsUtil";
 import { setActionResponseDisplayFormat } from "actions/pluginActionActions";
 import { getUpdateTimestamp } from "components/editorComponents/Debugger/ErrorLogs/ErrorLogItem";
 import type { SourceEntity } from "entities/AppsmithConsole";
 import type { Action } from "entities/Action";
-import { getActionData } from "@appsmith/selectors/entitiesSelector";
+import { getActionData } from "ee/selectors/entitiesSelector";
 import { actionResponseDisplayDataFormats } from "../utils";
 import { useFeatureFlag } from "utils/hooks/useFeatureFlag";
-import { FEATURE_FLAG } from "@appsmith/entities/FeatureFlag";
-import { getHasExecuteActionPermission } from "@appsmith/utils/BusinessFeatures/permissionPageHelpers";
+import { FEATURE_FLAG } from "ee/entities/FeatureFlag";
+import { getHasExecuteActionPermission } from "ee/utils/BusinessFeatures/permissionPageHelpers";
 import { getErrorAsString } from "sagas/ActionExecution/errorUtils";
 import { isString } from "lodash";
 import ActionExecutionInProgressView from "components/editorComponents/ActionExecutionInProgressView";
 import { EditorTheme } from "components/editorComponents/CodeEditor/EditorConfig";
 import BindDataButton from "./BindDataButton";
-import { getQueryPaneDebuggerState } from "selectors/queryPaneSelectors";
+import {
+  getPluginActionDebuggerState,
+  setPluginActionEditorDebuggerState,
+} from "PluginActionEditor/store";
+import { EDITOR_TABS } from "constants/QueryEditorConstants";
+import {
+  createMessage,
+  PREPARED_STATEMENT_WARNING,
+} from "ee/constants/messages";
 
 const HelpSection = styled.div``;
 
@@ -53,6 +66,7 @@ const ResponseContentWrapper = styled.div<{ isError: boolean }>`
   ${HelpSection} {
     margin-bottom: 10px;
   }
+
   position: relative;
 `;
 
@@ -86,10 +100,12 @@ const QueryResponseTab = (props: Props) => {
   const actionResponse = useSelector((state) =>
     getActionData(state, currentActionConfig.id),
   );
-  const { responseTabHeight } = useSelector(getQueryPaneDebuggerState);
+  const { responseTabHeight } = useSelector(getPluginActionDebuggerState);
 
   const { responseDataTypes, responseDisplayFormat } =
     actionResponseDisplayDataFormats(actionResponse);
+
+  let output: Record<string, unknown>[] | string = "";
 
   const responseBodyTabs =
     responseDataTypes &&
@@ -98,10 +114,12 @@ const QueryResponseTab = (props: Props) => {
         index: index,
         key: dataType.key,
         title: dataType.title,
-        panelComponent: responseTabComponent(
-          dataType.key,
-          output,
-          responseTabHeight,
+        panelComponent: (
+          <ResponseFormatTabs
+            data={output}
+            responseType={dataType.key}
+            tableBodyHeight={responseTabHeight}
+          />
         ),
       };
     });
@@ -131,6 +149,7 @@ const QueryResponseTab = (props: Props) => {
         source: "QUERY_PANE",
       });
     }
+
     dispatch(
       setActionResponseDisplayFormat({
         id: currentActionConfig?.id || "",
@@ -150,7 +169,7 @@ const QueryResponseTab = (props: Props) => {
 
   let error = runErrorMessage;
   let hintMessages: Array<string> = [];
-  let output: Record<string, any>[] | null = null;
+  let showPreparedStatementWarning = false;
 
   // Query is executed even once during the session, show the response data.
   if (actionResponse) {
@@ -176,14 +195,43 @@ const QueryResponseTab = (props: Props) => {
     } else {
       //reset error.
       error = "";
+      // TODO: Fix this the next time the file is edited
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       output = actionResponse.body as any;
     }
+
     if (actionResponse.messages && actionResponse.messages.length) {
       //reset error.
       error = "";
       hintMessages = actionResponse.messages;
     }
+
+    const { actionConfiguration } = currentActionConfig;
+    const hasPluginSpecifiedTemplates =
+      actionConfiguration?.pluginSpecifiedTemplates?.[0]?.value === true;
+    // oracle have different key for prepared statements
+    const hasPreparedStatement =
+      actionConfiguration?.formData?.preparedStatement?.data === true;
+
+    if (error && (hasPluginSpecifiedTemplates || hasPreparedStatement)) {
+      showPreparedStatementWarning = true;
+    }
   }
+
+  const navigateToSettings = useCallback(() => {
+    dispatch(
+      setPluginActionEditorDebuggerState({
+        selectedTab: EDITOR_TABS.SETTINGS,
+      }),
+    );
+  }, [dispatch]);
+
+  const preparedStatementCalloutLinks: CalloutLinkProps[] = [
+    {
+      onClick: navigateToSettings,
+      children: createMessage(PREPARED_STATEMENT_WARNING.LINK),
+    },
+  ];
 
   if (isRunning) {
     return (
@@ -196,6 +244,15 @@ const QueryResponseTab = (props: Props) => {
 
   return (
     <ResponseContentWrapper isError={!!error}>
+      {showPreparedStatementWarning && (
+        <Callout
+          data-testid="t--prepared-statement-warning"
+          kind="warning"
+          links={preparedStatementCalloutLinks}
+        >
+          {createMessage(PREPARED_STATEMENT_WARNING.MESSAGE)}
+        </Callout>
+      )}
       {error && (
         <ResponseTabErrorContainer>
           <ResponseTabErrorContent>
@@ -277,17 +334,19 @@ const QueryResponseTab = (props: Props) => {
                 suggestedWidgets={actionResponse?.suggestedWidgets}
               />
             </Flex>
-            {responseTabComponent(
-              selectedControl || segmentedControlOptions[0]?.value,
-              output,
-              responseTabHeight,
-            )}
+            <ResponseFormatTabs
+              data={output}
+              responseType={
+                selectedControl || segmentedControlOptions[0]?.value
+              }
+              tableBodyHeight={responseTabHeight}
+            />
           </ResponseDataContainer>
         )}
       {!output && !error && (
         <NoResponse
-          isButtonDisabled={!isExecutePermitted}
-          isQueryRunning={isRunning}
+          isRunDisabled={!isExecutePermitted}
+          isRunning={isRunning}
           onRunClick={responseTabOnRunClick}
         />
       )}

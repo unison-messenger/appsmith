@@ -8,7 +8,7 @@ import {
   SEMRESATTRS_SERVICE_VERSION,
   SEMRESATTRS_SERVICE_INSTANCE_ID,
 } from "@opentelemetry/semantic-conventions";
-import { getAppsmithConfigs } from "@appsmith/configs";
+import { getAppsmithConfigs } from "ee/configs";
 import { W3CTraceContextPropagator } from "@opentelemetry/core";
 import {
   MeterProvider,
@@ -20,14 +20,25 @@ import {
 } from "@opentelemetry/exporter-metrics-otlp-http";
 import type { Context, TextMapSetter } from "@opentelemetry/api";
 import { metrics } from "@opentelemetry/api";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { PageLoadInstrumentation } from "./PageLoadInstrumentation";
 
 enum CompressionAlgorithm {
   NONE = "none",
   GZIP = "gzip",
 }
 const { newRelic } = getAppsmithConfigs();
-const { applicationId, otlpEndpoint, otlpLicenseKey, otlpServiceName } =
-  newRelic;
+const {
+  applicationId,
+  browserAgentEndpoint,
+  otlpEndpoint,
+  otlpLicenseKey,
+  otlpServiceName,
+} = newRelic;
+
+// This base domain is used to filter out the Smartlook requests from the browser agent
+// There are some requests made to subdomains of smartlook.cloud which will also be filtered out
+const smartlookBaseDomain = "smartlook.cloud";
 
 const tracerProvider = new WebTracerProvider({
   resource: new Resource({
@@ -62,6 +73,7 @@ const processor = new BatchSpanProcessor(
 
 const W3C_OTLP_TRACE_HEADER = "traceparent";
 const CUSTOM_OTLP_TRACE_HEADER = "traceparent-otlp";
+
 //We are overriding the default header "traceparent" used for trace context because the browser
 // agent shares the same header's distributed tracing
 class CustomW3CTraceContextPropagator extends W3CTraceContextPropagator {
@@ -112,3 +124,17 @@ const meterProvider = new MeterProvider({
 
 // Register the MeterProvider globally
 metrics.setGlobalMeterProvider(meterProvider);
+
+registerInstrumentations({
+  tracerProvider,
+  meterProvider,
+  instrumentations: [
+    new PageLoadInstrumentation({
+      ignoreResourceUrls: [
+        browserAgentEndpoint,
+        otlpEndpoint,
+        smartlookBaseDomain,
+      ],
+    }),
+  ],
+});

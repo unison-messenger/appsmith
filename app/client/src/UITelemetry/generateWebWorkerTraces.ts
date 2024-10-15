@@ -14,7 +14,7 @@ export interface WebworkerSpanData {
 //to regular otlp telemetry data and subsequently exported to our telemetry collector
 export const newWebWorkerSpanData = (
   spanName: string,
-  attributes: SpanAttributes,
+  attributes: SpanAttributes = {},
 ): WebworkerSpanData => {
   return {
     attributes,
@@ -28,6 +28,21 @@ const addEndTimeForWebWorkerSpanData = (span: WebworkerSpanData) => {
   span.endTime = Date.now();
 };
 
+export const profileAsyncFn = async <T>(
+  spanName: string,
+  fn: () => Promise<T>,
+  allSpans: Record<string, WebworkerSpanData | SpanAttributes>,
+  attributes: SpanAttributes = {},
+) => {
+  const span = newWebWorkerSpanData(spanName, attributes);
+  const res: T = await fn();
+
+  addEndTimeForWebWorkerSpanData(span);
+  allSpans[spanName] = span;
+
+  return res;
+};
+
 export const profileFn = <T>(
   spanName: string,
   attributes: SpanAttributes = {},
@@ -36,8 +51,10 @@ export const profileFn = <T>(
 ) => {
   const span = newWebWorkerSpanData(spanName, attributes);
   const res: T = fn();
+
   addEndTimeForWebWorkerSpanData(span);
   allSpans[spanName] = span;
+
   return res;
 };
 
@@ -51,6 +68,7 @@ export const convertWebworkerSpansToRegularSpans = (
     .forEach((spanData) => {
       const { attributes, endTime, spanName, startTime } = spanData;
       const span = startNestedSpan(spanName, parentSpan, attributes, startTime);
+
       span?.end(endTime);
     });
 };
@@ -62,6 +80,7 @@ export const filterSpanData = (
     .filter((key) => !key.startsWith("__"))
     .reduce<Record<string, WebworkerSpanData>>((obj, key) => {
       obj[key] = spanData[key] as WebworkerSpanData;
+
       return obj;
     }, {});
 };

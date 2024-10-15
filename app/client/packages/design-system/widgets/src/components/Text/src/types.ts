@@ -1,11 +1,11 @@
 import type {
   TYPOGRAPHY_VARIANTS,
   TYPOGRAPHY_FONT_WEIGHTS,
-} from "@design-system/theming";
+} from "@appsmith/wds-theming";
 import type { ReactNode } from "react";
 import type { COLORS } from "../../../shared";
 
-export interface TextProps {
+export interface TextProps extends React.HTMLAttributes<HTMLElement> {
   /** size variant of the text
    * @default body
    */
