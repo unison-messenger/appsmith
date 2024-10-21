@@ -103,21 +103,31 @@ jobs:
       - name: Set up Depot CLI
         uses: depot/setup-action@v1
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
+      - name: Login to Yandex Cloud Container Registry
+        id: login-cr
+        uses: yc-actions/yc-cr-login@v1
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
 
-      - name: Build and push environment specific image to Docker Hub
-        if: success()
-        uses: depot/build-push-action@v1
+      - name: Set Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            name=${{ secrets.YCR_REGESTRY }}/${{ inputs.YCR_REPOSITORY }},enable=true
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ env.ALIAS }}
+            type=raw,value={{branch}}
+            type=raw,value=${{ env.ALIAS }}-{{sha}}-{{date 'DD.MM.YYYY-HH.mm'}}
+            type=raw,value={{sha}}-{{date 'DD.MM.YYYY-HH.mm'}}
+  
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          platforms: linux/arm64,linux/amd64
           build-args: |
-            APPSMITH_SEGMENT_CE_KEY=${{ secrets.APPSMITH_SEGMENT_CE_KEY }}
-            BASE=${{ vars.DOCKER_HUB_ORGANIZATION }}/base-${{ vars.EDITION }}:nightly
-          tags: |
-            ${{ vars.DOCKER_HUB_ORGANIZATION }}/appsmith-${{ vars.EDITION }}:${{ inputs.tag }}
+            BASE=appsmith/appsmith-ee
+            # APPSMITH_SEGMENT_CE_KEY=${{ secrets.APPSMITH_SEGMENT_CE_KEY }}
+          tags: ${{ steps.meta.outputs.tags }}
