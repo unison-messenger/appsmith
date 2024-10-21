@@ -106,9 +106,7 @@ jobs:
             name=${{ secrets.YCR_REGESTRY }}/appsmith,enable=true
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ env.ALIAS }}
             type=raw,value={{branch}}
-            type=raw,value=${{ env.ALIAS }}-{{sha}}-{{date 'DD.MM.YYYY-HH.mm'}}
             type=raw,value={{sha}}-{{date 'DD.MM.YYYY-HH.mm'}}
   
       - name: Build and push
