@@ -3,17 +3,6 @@ name: Ad-hoc Docker Image
 on:
   # This line enables manual triggering of this workflow.
   workflow_dispatch:
-    inputs:
-      branch:
-        description: Branch to build image out of
-        required: false
-        type: string
-        default: master
-      tag:
-        description: Tag to use for image
-        required: false
-        type: string
-        default: ad-hoc
 
 jobs:
   server-build:
@@ -21,7 +10,7 @@ jobs:
     uses: ./.github/workflows/server-build.yml
     secrets: inherit
     with:
-      branch: ${{ inputs.branch }}
+      branch: ${{ github.ref_name }}
       skip-tests: true
 
   client-build:
@@ -29,14 +18,14 @@ jobs:
     uses: ./.github/workflows/client-build.yml
     secrets: inherit
     with:
-      branch: ${{ inputs.branch }}
+      branch: ${{ github.ref_name }}
 
   rts-build:
     name: rts-build
     uses: ./.github/workflows/rts-build.yml
     secrets: inherit
     with:
-      branch: ${{ inputs.branch }}
+      branch: ${{ github.ref_name }}
 
   package:
     needs: [server-build, client-build, rts-build]
@@ -114,7 +103,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            name=${{ secrets.YCR_REGESTRY }}/${{ inputs.YCR_REPOSITORY }},enable=true
+            name=${{ secrets.YCR_REGESTRY }}/appsmith,enable=true
           tags: |
             type=raw,value=latest
             type=raw,value=${{ env.ALIAS }}
