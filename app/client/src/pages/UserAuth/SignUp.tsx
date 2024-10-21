@@ -116,12 +116,12 @@ export function SignUp(props: SignUpFormProps) {
   const socialLoginList = useSelector(getThirdPartyAuths);
   const shouldDisableSignupButton = pristine || !isFormValid;
   const location = useLocation();
-  const isBrandingEnabled = useFeatureFlag(
-    FEATURE_FLAG.license_branding_enabled,
-  );
-  const tentantConfig = useSelector(getTenantConfig);
-  const { instanceName } = tentantConfig;
-  const htmlPageTitle = getHTMLPageTitle(isBrandingEnabled, instanceName);
+  // const isBrandingEnabled = useFeatureFlag(
+  //   FEATURE_FLAG.license_branding_enabled,
+  // );
+  // const tentantConfig = useSelector(getTenantConfig);
+  // const { instanceName } = tentantConfig;
+  const htmlPageTitle = getHTMLPageTitle();
 
   const recaptchaStatus = useScript(
     `https://www.google.com/recaptcha/api.js?render=${googleRecaptchaSiteKey.apiKey}`,

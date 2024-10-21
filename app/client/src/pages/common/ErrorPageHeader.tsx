@@ -18,7 +18,7 @@ import { getSelectedAppTheme } from "selectors/appThemingSelectors";
 import { NAVIGATION_SETTINGS } from "constants/AppConstants";
 import { get } from "lodash";
 //import { getAssetUrl } from "ee/utils/airgapHelpers";
-//import { getCurrentApplication } from "ee/selectors/applicationSelectors";
+import { getCurrentApplication } from "ee/selectors/applicationSelectors";
 
 const StyledPageHeader = styled(StyledHeader)`
   box-shadow: none;
