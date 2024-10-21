@@ -72,7 +72,7 @@ export function PageWrapper(props: PageWrapperProps) {
   const { instanceName } = tentantConfig;
 
   const titleSuffix = useMemo(
-    () => getHTMLPageTitle(isBrandingEnabled, instanceName),
+    () => getHTMLPageTitle(),
     [isBrandingEnabled, instanceName],
   );
 

@@ -17,12 +17,13 @@ export const getUpgradeBanner = (isEnabled: boolean) => {
   } else return <UpgradeBanner_CE />;
 };
 
-export const getHTMLPageTitle = (isEnabled: boolean, instanceName: string) => {
-  if (isEnabled) {
-    return getHtmlPageTitle_EE(instanceName);
-  } else {
-    return getHtmlPageTitle_CE(instanceName);
-  }
+export const getHTMLPageTitle = () => {
+  return "YuChat Admin";
+  // if (isEnabled) {
+  //   return getHtmlPageTitle_EE(instanceName);
+  // } else {
+  //   return getHtmlPageTitle_CE(instanceName);
+  // }
 };
 
 export const getPageTitle = (
