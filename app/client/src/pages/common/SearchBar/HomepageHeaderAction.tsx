@@ -96,88 +96,88 @@ const HomepageHeaderAction = ({
           />
         </Tooltip>
       )}
-      {!isAirgappedInstance && (
-        <Menu
-          onOpenChange={(open) => {
-            if (open) {
-              setShowIntercomConsent(false);
-              dispatch({
-                type: ReduxActionTypes.FETCH_RELEASES,
-              });
-            }
-          }}
-        >
-          <Tooltip content={createMessage(HELP)} placement="bottom">
-            <MenuTrigger>
-              <Button
-                className="t--help-menu-option"
-                isIconButton
-                kind="tertiary"
-                onClick={() => {}}
-                size="md"
-                startIcon="question-line"
-              />
-            </MenuTrigger>
-          </Tooltip>
-          <MenuContent align="end" width="172px">
-            {showIntercomConsent ? (
-              <IntercomConsent showIntercomConsent={setShowIntercomConsent} />
-            ) : (
-              <>
-                <MenuItem
-                  className="t--documentation-button"
-                  onClick={() => {
-                    window.open(DOCS_BASE_URL, "_blank");
-                  }}
-                  startIcon="book-line"
-                >
-                  {createMessage(DOCUMENTATION)}
-                </MenuItem>
-                {intercomAppID && window.Intercom && !isAirgapped() && (
-                  <MenuItem
-                    onSelect={(e) => {
-                      if (user?.isIntercomConsentGiven || cloudHosting) {
-                        window.Intercom("show");
-                      } else {
-                        e?.preventDefault();
-                        setShowIntercomConsent(true);
-                      }
-                    }}
-                    startIcon="chat-help"
-                  >
-                    {createMessage(CHAT_WITH_US)}
-                  </MenuItem>
-                )}
-                <MenuSeparator className="mb-1" />
-                <MenuItem
-                  className="t--product-updates-btn"
-                  data-testid="t--product-updates-btn"
-                  onClick={() => {
-                    setIsProductUpdatesModalOpen(true);
-                  }}
-                  startIcon="gift-line"
-                >
-                  {createMessage(WHATS_NEW)}
-                </MenuItem>
-                <VersionData>
-                  <div>
-                    {createMessage(
-                      APPSMITH_DISPLAY_VERSION,
-                      appVersion.edition,
-                      appVersion.id.endsWith("-SNAPSHOT")
-                        ? appVersion.sha.substring(0, 8)
-                        : appVersion.id,
-                    )}
-                  </div>
-                  {howMuchTimeBefore !== "" && (
-                    <div>Released {howMuchTimeBefore} ago</div>
-                  )}
-                </VersionData>
-              </>
-            )}
-          </MenuContent>
-        </Menu>
-      )}
+      {/*{!isAirgappedInstance && (*/}
+      {/*  <Menu*/}
+      {/*    onOpenChange={(open) => {*/}
+      {/*      if (open) {*/}
+      {/*        setShowIntercomConsent(false);*/}
+      {/*        dispatch({*/}
+      {/*          type: ReduxActionTypes.FETCH_RELEASES,*/}
+      {/*        });*/}
+      {/*      }*/}
+      {/*    }}*/}
+      {/*  >*/}
+      {/*    <Tooltip content={createMessage(HELP)} placement="bottom">*/}
+      {/*      <MenuTrigger>*/}
+      {/*        <Button*/}
+      {/*          className="t--help-menu-option"*/}
+      {/*          isIconButton*/}
+      {/*          kind="tertiary"*/}
+      {/*          onClick={() => {}}*/}
+      {/*          size="md"*/}
+      {/*          startIcon="question-line"*/}
+      {/*        />*/}
+      {/*      </MenuTrigger>*/}
+      {/*    </Tooltip>*/}
+      {/*    <MenuContent align="end" width="172px">*/}
+      {/*      {showIntercomConsent ? (*/}
+      {/*        <IntercomConsent showIntercomConsent={setShowIntercomConsent} />*/}
+      {/*      ) : (*/}
+      {/*        <>*/}
+      {/*          <MenuItem*/}
+      {/*            className="t--documentation-button"*/}
+      {/*            onClick={() => {*/}
+      {/*              window.open(DOCS_BASE_URL, "_blank");*/}
+      {/*            }}*/}
+      {/*            startIcon="book-line"*/}
+      {/*          >*/}
+      {/*            {createMessage(DOCUMENTATION)}*/}
+      {/*          </MenuItem>*/}
+      {/*          {intercomAppID && window.Intercom && !isAirgapped() && (*/}
+      {/*            <MenuItem*/}
+      {/*              onSelect={(e) => {*/}
+      {/*                if (user?.isIntercomConsentGiven || cloudHosting) {*/}
+      {/*                  window.Intercom("show");*/}
+      {/*                } else {*/}
+      {/*                  e?.preventDefault();*/}
+      {/*                  setShowIntercomConsent(true);*/}
+      {/*                }*/}
+      {/*              }}*/}
+      {/*              startIcon="chat-help"*/}
+      {/*            >*/}
+      {/*              {createMessage(CHAT_WITH_US)}*/}
+      {/*            </MenuItem>*/}
+      {/*          )}*/}
+      {/*          <MenuSeparator className="mb-1" />*/}
+      {/*          <MenuItem*/}
+      {/*            className="t--product-updates-btn"*/}
+      {/*            data-testid="t--product-updates-btn"*/}
+      {/*            onClick={() => {*/}
+      {/*              setIsProductUpdatesModalOpen(true);*/}
+      {/*            }}*/}
+      {/*            startIcon="gift-line"*/}
+      {/*          >*/}
+      {/*            {createMessage(WHATS_NEW)}*/}
+      {/*          </MenuItem>*/}
+      {/*          <VersionData>*/}
+      {/*            <div>*/}
+      {/*              {createMessage(*/}
+      {/*                APPSMITH_DISPLAY_VERSION,*/}
+      {/*                appVersion.edition,*/}
+      {/*                appVersion.id.endsWith("-SNAPSHOT")*/}
+      {/*                  ? appVersion.sha.substring(0, 8)*/}
+      {/*                  : appVersion.id,*/}
+      {/*              )}*/}
+      {/*            </div>*/}
+      {/*            {howMuchTimeBefore !== "" && (*/}
+      {/*              <div>Released {howMuchTimeBefore} ago</div>*/}
+      {/*            )}*/}
+      {/*          </VersionData>*/}
+      {/*        </>*/}
+      {/*      )}*/}
+      {/*    </MenuContent>*/}
+      {/*  </Menu>*/}
+      {/*)}*/}
     </div>
   );
 };

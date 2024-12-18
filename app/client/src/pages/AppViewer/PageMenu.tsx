@@ -146,16 +146,16 @@ export function PageMenu(props: NavigationProps) {
                 insideSidebar
               />
 
-              {!hideWatermark && (
-                <a
-                  className="flex mt-2 hover:no-underline"
-                  href="https://appsmith.com"
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <BrandingBadge />
-                </a>
-              )}
+              {/*{!hideWatermark && (*/}
+              {/*  <a*/}
+              {/*    className="flex mt-2 hover:no-underline"*/}
+              {/*    href="https://appsmith.com"*/}
+              {/*    rel="noreferrer"*/}
+              {/*    target="_blank"*/}
+              {/*  >*/}
+              {/*    <BrandingBadge />*/}
+              {/*  </a>*/}
+              {/*)}*/}
             </StyledCtaContainer>
           )}
         </div>
