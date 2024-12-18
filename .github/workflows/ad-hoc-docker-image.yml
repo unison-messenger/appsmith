@@ -108,13 +108,13 @@ jobs:
             type=raw,value=latest
             type=raw,value={{branch}}
             type=raw,value={{sha}}-{{date 'DD.MM.YYYY-HH.mm'}}
-  
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           build-args: |
-            BASE=appsmith/base-ce
+            BASE=appsmith/base-ce:release
             # APPSMITH_SEGMENT_CE_KEY=${{ secrets.APPSMITH_SEGMENT_CE_KEY }}
           tags: ${{ steps.meta.outputs.tags }}
