@@ -10,7 +10,7 @@ function createMessage(format: (...strArgs: any[]) => string, ...args: any[]) {
   For self hosted CE, it displays the string "Appsmith Community v1.10.0".
  */
 export const APPSMITH_DISPLAY_VERSION = (edition: string, version: string) =>
-  `Appsmith ${edition} ${version}`;
+  `Admin ${edition} ${version}`;
 export const INTERCOM_CONSENT_MESSAGE = () =>
   `Can we have your email for better support?`;
 export const YES = () => `Yes`;
@@ -84,7 +84,7 @@ export const SIGNUP_PAGE_LOGIN_LINK_TEXT = () => `Sign in`;
 export const SIGNUP_PAGE_NAME_INPUT_SUBTEXT = () => `How should we call you?`;
 export const SIGNUP_PAGE_SUBMIT_BUTTON_TEXT = () => `Sign up`;
 export const ALREADY_HAVE_AN_ACCOUNT = () => `Already have an account?`;
-export const LOOKING_TO_SELF_HOST = () => "Looking to self-host Appsmith?";
+export const LOOKING_TO_SELF_HOST = () => "Looking to self-host admin app?";
 export const VISIT_OUR_DOCS = () => "Visit our docs";
 
 export const SIGNUP_PAGE_SUCCESS = () =>
@@ -120,7 +120,7 @@ export const FORGOT_PASSWORD_PAGE_SUBTITLE = () =>
   `We will send a reset link to the email below`;
 export const FORGOT_PASSWORD_PAGE_SUBMIT_BUTTON_TEXT = () => `Send reset link`;
 export const FORGOT_PASSWORD_SUCCESS_TEXT = (email: string) =>
-  `A password reset link has been sent to your email address ${email} registered with Appsmith.`;
+  `A password reset link has been sent to your email address ${email} registered.`;
 
 export const VERIFICATION_PENDING_TITLE = () => `Check your inbox`;
 export const VERIFICATION_PENDING_BODY = () =>
@@ -155,14 +155,14 @@ export const ERROR_413 = (maxFileSize: number) =>
 export const GENERIC_API_EXECUTION_ERROR = () => `API execution error`;
 export const APPSMITH_HTTP_ERROR_413 = () => `413 CONTENT_TOO_LARGE`;
 export const ERROR_403 = (entity: string, userEmail: string) =>
-  `Sorry, but your account (${userEmail}) does not seem to have the required access to update this ${entity}. Please get in touch with your Appsmith admin to resolve this.`;
+  `Sorry, but your account (${userEmail}) does not seem to have the required access to update this ${entity}. Please get in touch with your admin to resolve this.`;
 export const PAGE_NOT_FOUND_ERROR = () =>
   `The page you’re looking for either does not exist, or cannot be found`;
 export const INVALID_URL_ERROR = () => `Invalid URL`;
 export const INVALID_NAME_ERROR = () => `Invalid name`;
 export const MAKE_APPLICATION_PUBLIC = () => "Make application public";
 export const MAKE_APPLICATION_PUBLIC_TOOLTIP = () =>
-  "A public app is accessible to anyone who can access your instance of appsmith";
+  "A public app is accessible to anyone who can access your instance of admin";
 export const INVITE_TAB = () => "Invite";
 export const INVITE_USERS_VALIDATION_EMAIL_LIST = () =>
   `Invalid email address(es) found`;
@@ -206,7 +206,7 @@ export const PARTNER_PROGRAM_CALLOUT = (
 ) => `${email} is outside your organisation. If you’re building this app
 for someone else, you should check out our partner program.`;
 export const PARTNER_PROGRAM_CALLOUT_LINK = () =>
-  `Learn about Appsmith Partner Program`;
+  `Learn about Admin Partner Program`;
 export const NEW_APPLICATION = () => `New application`;
 export const APPLICATIONS = () => `Applications`;
 export const FIXED_APPLICATIONS = () => `Classic Applications`;
@@ -314,7 +314,7 @@ export const GOOGLE_RECAPTCHA_DOMAIN_ERROR = () =>
   `Google reCAPTCHA token generation failed! Please check the allowed domains.`;
 
 export const SERVER_API_TIMEOUT_ERROR = () =>
-  `Appsmith server is taking too long to respond. Please try again after some time`;
+  `Server is taking too long to respond. Please try again after some time`;
 export const DEFAULT_ERROR_MESSAGE = () => `There was an unexpected error`;
 export const REMOVE_FILE_TOOL_TIP = () => "Remove Upload";
 export const ERROR_FILE_TOO_LARGE = (fileSize: string) =>
@@ -429,7 +429,7 @@ export const OAUTH_AUTHORIZATION_FAILED =
   "Authorization failed. Please check your details or try again.";
 // Todo: improve this for appsmith_error error message
 export const OAUTH_AUTHORIZATION_APPSMITH_ERROR = "Something went wrong.";
-export const OAUTH_APPSMITH_TOKEN_NOT_FOUND = "Appsmith token not found";
+export const OAUTH_APPSMITH_TOKEN_NOT_FOUND = "Token not found";
 
 export const GSHEET_AUTHORIZATION_ERROR =
   "Authorisation failed, to continue using this data source authorize now.";
@@ -442,7 +442,7 @@ export const LOCAL_STORAGE_QUOTA_EXCEEDED_MESSAGE = () =>
 export const LOCAL_STORAGE_NO_SPACE_LEFT_ON_DEVICE_MESSAGE = () =>
   "Error saving a key in localStorage. You have run out of disk space";
 export const LOCAL_STORAGE_NOT_SUPPORTED_APP_MIGHT_NOT_WORK_AS_EXPECTED = () =>
-  "LocalStorage is not supported on your device. Some features including the Appsmith store won't work.";
+  "LocalStorage is not supported on your device. Some features including the store won't work.";
 
 export const OMNIBAR_PLACEHOLDER = () =>
   `Search widgets, queries or create new`;
@@ -462,12 +462,12 @@ export const PAGE_NOT_FOUND_TITLE = () => "404";
 export const PAGE_NOT_FOUND = () => "Page not found";
 export const PAGE_SERVER_TIMEOUT_ERROR_CODE = () => "504";
 export const PAGE_SERVER_TIMEOUT_TITLE = () =>
-  "Appsmith server is taking too long to respond";
+  "Server is taking too long to respond";
 export const PAGE_SERVER_TIMEOUT_DESCRIPTION = () =>
   `Please retry after some time`;
 export const PAGE_CLIENT_ERROR_TITLE = () => "Whoops something went wrong!";
 export const PAGE_CLIENT_ERROR_DESCRIPTION = () =>
-  "This is embarrassing, please contact Appsmith support for help";
+  "This is embarrassing, please contact support for help";
 
 export const PAGE_SERVER_UNAVAILABLE_ERROR_CODE = () => "503";
 
@@ -478,7 +478,7 @@ export const CONVERT_MODULE_TO_NEW_PKG_OPTION = () => "Add to a new package";
 // cloudHosting used in EE
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const PAGE_SERVER_UNAVAILABLE_TITLE = (cloudHosting: boolean) =>
-  "Appsmith server unavailable";
+  "Server unavailable";
 
 export const PAGE_SERVER_UNAVAILABLE_DESCRIPTION = () =>
   "Please try again later";
@@ -494,7 +494,7 @@ export const PAGE_SERVER_UNAVAILABLE_ERROR_MESSAGES = (
           {
             from: 40,
             to: 56,
-            href: "mailto: support@appsmith.com?subject=Appsmith 503 Server Error",
+            href: "mailto: support@yuchat.ai?subject=Admin 503 Server Error",
           },
         ],
         addNewLine: true,
@@ -512,7 +512,7 @@ export const PAGE_SERVER_UNAVAILABLE_ERROR_MESSAGES = (
           {
             from: 66,
             to: 70,
-            href: "https://docs.appsmith.com/learning-and-resources/how-to-guides/how-to-get-container-logs",
+            href: "https://yuchat.ai",
           },
         ],
         addNewLine: true,
@@ -523,7 +523,7 @@ export const PAGE_SERVER_UNAVAILABLE_ERROR_MESSAGES = (
           {
             from: 46,
             to: 50,
-            href: "/supervisor/logtail/backend",
+            href: "/",
           },
         ],
       },
@@ -571,14 +571,14 @@ export const EMPTY_JS_RESPONSE_LAST_HALF = () =>
   "to view response of selected function";
 export const INVALID_EMAIL = () => "Please enter a valid email";
 export const DEBUGGER_INTERCOM_TEXT = (text: string) =>
-  `Hi, \nI'm facing the following error on Appsmith, can you please help? \n\n${text}`;
+  `Hi, \nI'm facing the following error on Admin app, can you please help? \n\n${text}`;
 export const DEBUGGER_TRIGGER_ERROR = (propertyName: string) =>
   `Error occurred while evaluating trigger ${propertyName}`;
 
 export const TROUBLESHOOT_ISSUE = () => "Troubleshoot issue";
 export const DEBUGGER_OPEN_DOCUMENTATION = () => "Open documentation";
 export const DEBUGGER_SEARCH_SNIPPET = () => "Browse code snippets";
-export const DEBUGGER_APPSMITH_SUPPORT = () => "Get Appsmith support";
+export const DEBUGGER_APPSMITH_SUPPORT = () => "Get Admin support";
 
 //action creator menu
 export const NO_ACTION = () => `No action`;
@@ -1008,18 +1008,18 @@ export const CHANGES_ONLY_USER = () => "Changes since last commit";
 export const CHANGES_MADE_SINCE_LAST_COMMIT = () =>
   "Changes made since last commit";
 export const CHANGES_ONLY_MIGRATION = () =>
-  "Appsmith update changes since last commit";
+  "Admin app update changes since last commit";
 export const CHANGES_USER_AND_MIGRATION = () =>
-  "Appsmith update and user changes since last commit";
+  "Admin app update and user changes since last commit";
 export const CURRENT_PAGE_DISCARD_WARNING = (page: string) =>
   `Current page (${page}) is in the discard list.`;
 export const DISCARD_MESSAGE = () =>
-  `Some changes may reappear after discarding them, these changes support new features in Appsmith. You can safely commit them to your repository.`;
+  `Some changes may reappear after discarding them, these changes support new features in Admin app. You can safely commit them to your repository.`;
 // GIT DEPLOY end
 
 // GIT CHANGE LIST begin
 export const CHANGES_FROM_APPSMITH = () =>
-  "Some changes are platform upgrades from Appsmith.";
+  "Some changes are platform upgrades from Admin app.";
 export const TRY_TO_PULL = () =>
   "We will try to pull before pushing your changes.";
 export const NOT_PUSHED_YET = () =>
@@ -1087,19 +1087,19 @@ export const DISCONNECT_GIT_MESSAGE = () =>
   "This is irreversible. If you wish to reconnect, you will have to connect a new empty repository.";
 export const AUTOCOMMIT = () => "Auto - commit";
 export const AUTOCOMMIT_MESSAGE = () =>
-  "Enable/disable auto migrations from Appsmith.";
+  "Enable/disable auto migrations from Admin app.";
 export const AUTOCOMMIT_ENABLE = () => "Enable auto - commit";
 export const AUTOCOMMIT_DISABLE = () => "Disable auto - commit";
 export const AUTOCOMMIT_CONFIRM_DISABLE_MESSAGE = () =>
-  "Disabling auto-commit may result in uncommitted system changes after an Appsmith instance upgrade, requiring manual handling and potential discrepancies in Git versioning.";
+  "Disabling auto-commit may result in uncommitted system changes after an Admin app instance upgrade, requiring manual handling and potential discrepancies in Git versioning.";
 export const AUTOCOMMIT_IN_PROGRESS_MESSAGE = () =>
-  "Auto-committing Appsmith upgrade changes...";
+  "Auto-committing Admin app upgrade changes...";
 export const AUTOCOMMIT_ENABLED_TOAST = () =>
   "Auto-commit enabled successfully";
 export const AUTOCOMMIT_DISABLED_TOAST = () =>
   "Auto-commit disabled successfully";
 export const NEED_EMPTY_REPO_MESSAGE = () =>
-  "You need an empty repository to connect to Git on Appsmith, please create one on your Git service provider to continue.";
+  "You need an empty repository to connect to Git on Admin app, please create one on your Git service provider to continue.";
 export const GIT_IMPORT_WAITING = () =>
   "Please wait while we import the app...";
 export const GIT_CONNECT_WAITING = () =>
@@ -1126,7 +1126,7 @@ export const BRANCH_PROTECTION_DESC = () =>
 export const GO_TO_SETTINGS = () => "Go to settings";
 export const NOW_PROTECT_BRANCH = () =>
   "You can now protect your default branch.";
-export const APPSMITH_ENTERPRISE = () => "Appsmith Enterprise";
+export const APPSMITH_ENTERPRISE = () => "Admin app Enterprise";
 export const PROTECT_BRANCH_SUCCESS = () => "Changed protected branches";
 export const UPDATE_DEFAULT_BRANCH_SUCCESS = (branchName: string) =>
   `Updated default branch ${!!branchName ? `to ${branchName}` : ""}`;
@@ -1166,7 +1166,7 @@ export const CONTINUOUS_DELIVERY = () => "Continuous delivery";
 export const CONFIGURE_CD_TITLE = () => "Configure continuous delivery";
 export const CONFIGURE_CD_DESC = () =>
   "To automatically trigger a pull when changes occur on the remote branch, consider upgrading to our enterprise plan for enhanced functionality";
-export const TRY_APPSMITH_ENTERPRISE = () => "Try Appsmith Enterprise";
+export const TRY_APPSMITH_ENTERPRISE = () => "Try Admin app Enterprise";
 
 export const NAV_DESCRIPTION = () =>
   `Navigate to any page, widget or file across this project.`;
@@ -1208,21 +1208,21 @@ export enum ONBOARDING_CHECKLIST_ACTIONS {
 }
 
 export const ONBOARDING_CHECKLIST_BANNER_HEADER = () =>
-  "Amazing work! You’ve explored the basics of Appsmith";
+  "Amazing work! You’ve explored the basics of Admin app";
 export const ONBOARDING_CHECKLIST_BANNER_BODY = () =>
   "You can carry on here, or explore the homepage to see how your projects are stored.";
 export const ONBOARDING_CHECKLIST_BANNER_BUTTON = () => "Explore homepage";
 export const ONBOARDING_SKIPPED_FIRST_TIME_USER = () =>
   "Skipped onboarding tour";
-export const ONBOARDING_CHECKLIST_HEADER = () => "👋 Welcome to Appsmith!";
+export const ONBOARDING_CHECKLIST_HEADER = () => "👋 Welcome to Admin app!";
 export const ONBOARDING_CHECKLIST_BODY = () =>
-  "Let’s get you started on your first application, explore Appsmith yourself or follow our guide below to discover what Appsmith can do.";
+  "Let’s get you started on your first application, explore Admin app yourself or follow our guide below to discover what Admin app can do.";
 export const ONBOARDING_CHECKLIST_COMPLETE_TEXT = () => "complete";
 
 export const SIGNPOSTING_POPUP_SUBTITLE = () =>
   "Here’s what you need to do to build your first app:";
 export const SIGNPOSTING_SUCCESS_POPUP = {
-  title: () => "🎉 Awesome! You’ve explored the basics of Appsmith",
+  title: () => "🎉 Awesome! You’ve explored the basics of Admin app",
   subtitle: () =>
     "You can carry on building the app from here on. If you are still not sure, checkout our documentation or try guided tour.",
 };
@@ -1284,11 +1284,11 @@ export const ONBOARDING_CHECKLIST_FOOTER = () =>
   "Not sure where to start? Take the welcome tour";
 
 export const ONBOARDING_TELEMETRY_POPUP = () =>
-  "We only collect usage data to make Appsmith better for everyone. Visit admin settings to toggle this off.";
+  "We only collect usage data to make Admin app better for everyone. Visit admin settings to toggle this off.";
 
 //Introduction modal
 export const HOW_APPSMITH_WORKS = () =>
-  "Here’s a quick overview of how Appsmith works. ";
+  "Here’s a quick overview of how Admin app works. ";
 export const ONBOARDING_INTRO_CONNECT_YOUR_DATABASE = () =>
   "Connect to your database or APIs";
 export const DRAG_AND_DROP = () =>
@@ -1303,9 +1303,9 @@ export const BUILD_MY_FIRST_APP = () => "Build on my own";
 export const ONBOARDING_INTRO_FOOTER = () =>
   "Let’s start building your first application";
 export const START_TUTORIAL = () => "Start tutorial";
-export const WELCOME_TO_APPSMITH = () => "Welcome to Appsmith!";
+export const WELCOME_TO_APPSMITH = () => "Welcome to Admin app!";
 export const QUERY_YOUR_DATABASE = () =>
-  "Query your own database or API inside Appsmith. Write JS to construct dynamic queries.";
+  "Query your own database or API inside Admin app. Write JS to construct dynamic queries.";
 export const SIGNPOSTING_INFO_MENU = {
   documentation: () => "Open documentation",
 };
@@ -1383,7 +1383,7 @@ export const WELCOME_FORM_DATA_COLLECTION_BODY = () =>
   "Share anonymous usage data to help improve the product.";
 export const WELCOME_FORM_DATA_COLLECTION_LINK = () => "See what is shared";
 export const WELCOME_FORM_DATA_COLLECTION_LABEL_ENABLE = () =>
-  "Share data & make Appsmith better!";
+  "Share data & make Admin app better!";
 export const WELCOME_FORM_DATA_COLLECTION_LABEL_DISABLE = () =>
   "Don't share any data";
 export const WELCOME_FORM_NEWLETTER_HEADER = () => "Stay in touch";
@@ -1406,7 +1406,7 @@ export const LAYOUT_DROPDOWN_TOOLTIP = () =>
   "Choose how your application looks on desktop, tablet and mobile devices";
 export const DEPLOY_BUTTON_TOOLTIP = () =>
   "Deploy the current version of the application";
-export const SHARE_BUTTON_TOOLTIP = () => "Invite your team to Appsmith";
+export const SHARE_BUTTON_TOOLTIP = () => "Invite your team to Admin app";
 export const SHARE_BUTTON_TOOLTIP_WITH_USER = (length: number) => () =>
   `Shared with ${length} other`;
 export const DEBUGGER_TOOLTIP = () => "Open Debugger";
@@ -1439,7 +1439,7 @@ export const RESTART_ERROR_BODY = () =>
 export const RESTART_ERROR_HEADER = () => "Restarting failed";
 export const RETRY_BUTTON = () => "Retry";
 export const INFO_VERSION_MISMATCH_FOUND_RELOAD_REQUEST = () =>
-  "Hey! There is a new version of Appsmith available. Please consider refreshing your window.";
+  "Hey! There is a new version of Admin app available. Please consider refreshing your window.";
 export const TEST_EMAIL_SUCCESS = (email: string) => () =>
   `Test email sent, please check the inbox of ${email}`;
 export const TEST_EMAIL_SUCCESS_TROUBLESHOOT = () => "Troubleshoot";
@@ -1451,7 +1451,7 @@ export const DISCONNECT_AUTH_ERROR = () =>
   "Cannot disconnect the only connected authentication method.";
 export const MANDATORY_FIELDS_ERROR = () => "Mandatory fields cannot be empty";
 export const FORM_LOGIN_DESC = () =>
-  "Enable your workspace to sign in with Appsmith Form.";
+  "Enable your workspace to sign in with Admin app Form.";
 export const GOOGLE_AUTH_DESC = () =>
   "Enable your workspace to sign in with Google (OAuth 2.0) single sign-on (SSO).";
 export const GITHUB_AUTH_DESC = () =>
@@ -1471,7 +1471,7 @@ export const ENTERPRISE_TAG = () => "Enterprise";
 export const AVAILABLE_ON_BUSINESS = () => "Available on a business plan only";
 export const EXCLUSIVE_TO_BUSINESS = (featureName: string) =>
   `The ${featureName} feature is exclusive to workspaces on the business plan`;
-export const AVAILABLE_ON_ENTERPRISE = () => "Available on Appsmith Enterprise";
+export const AVAILABLE_ON_ENTERPRISE = () => "Available on Admin app Enterprise";
 // Upgrade pages end
 
 // Audit logs begin
@@ -1520,18 +1520,18 @@ export const ACCESS_CONTROL_UPGRADE_PAGE_FOOTER = () =>
 
 // Provisioning upgrade page begin
 export const USER_PROVISIONING_FOR_ENTERPRISES = () =>
-  "Manage Appsmith users via your identity provider";
+  "Manage Admin app users via your identity provider";
 export const PROVISIONING_UPGRADE_PAGE_SUB_HEADING = () =>
-  `Add and remove Appsmith users centrally. Sync existing groups to Appsmith.`;
+  `Add and remove Admin app users centrally. Sync existing groups to Admin app.`;
 export const PROVISION_DEPROVISION_USERS = () =>
   "Provision and deprovision users from your IdP";
 export const PROVISION_DEPROVISION_USERS_DETAIL1 = () =>
-  `Control user authorization and access to Appsmith workspaces and apps via your IdP using the SCIM protocol.<div>&nbsp;</div><div><span style="font-style: italic;font-weight: normal;">More protocols coming soon</span></div>`;
+  `Control user authorization and access to Admin app workspaces and apps via your IdP using the SCIM protocol.<div>&nbsp;</div><div><span style="font-style: italic;font-weight: normal;">More protocols coming soon</span></div>`;
 export const AUTO_GROUP_SYNC = () => "Automatic group sync";
 export const AUTO_GROUP_SYNC_DETAIL1 = () =>
-  `Easily manage access for groups when you sync them to Appsmith from your IdP.`;
+  `Easily manage access for groups when you sync them to Admin app from your IdP.`;
 export const PROVISIONING_UPGRADE_PAGE_FOOTER = () =>
-  "Secure your Appsmith apps with Granular Access Controls, Audit Logs, Custom SSO, and more on Appsmith Enterprise.";
+  "Secure your Admin app apps with Granular Access Controls, Audit Logs, Custom SSO, and more on Admin app Enterprise.";
 // Provisioning upgrade page end
 
 //
@@ -1539,7 +1539,7 @@ export const WELCOME_FORM_NON_SUPER_USER_ROLE_DROPDOWN = () =>
   "Tell us about your primary skillset";
 export const WELCOME_FORM_NON_SUPER_USER_ROLE = () => "Role";
 export const WELCOME_FORM_NON_SUPER_USER_USE_CASE = () =>
-  "What would you like to use Appsmith for?";
+  "What would you like to use Admin app for?";
 export const WELCOME_FORM_NON_SUPER_USER_PROFICIENCY_LEVEL = () =>
   "What is your general development proficiency?";
 
@@ -1661,7 +1661,7 @@ export const ADMIN_BRANDING_COLOR_TOOLTIP_FONT = () =>
 export const ADMIN_BRANDING_COLOR_TOOLTIP_DISABLED = () =>
   `Used as background color for disabled buttons.`;
 export const ADMIN_BRANDING_UPGRADE_INTERCOM_MESSAGE = () =>
-  `I would like to enable Custom Branding for my workspace and am interested in Appsmith Business.`;
+  `I would like to enable Custom Branding for my workspace and am interested in Admin app Business.`;
 
 // Guided tour
 // -- STEPS ---
@@ -1717,7 +1717,7 @@ export const DESCRIPTION = () =>
 export const BUTTON_TEXT = () => "Start building";
 // -- Rating --
 export const RATING_TITLE = () =>
-  "Congratulations! You just built your first app in Appsmith.";
+  "Congratulations! You just built your first app in Admin app.";
 export const RATING_DESCRIPTION = () =>
   "You can now invite others to this application.";
 export const RATING_TEXT = () => "Rate your experience";
@@ -1935,18 +1935,18 @@ export const IN_APP_EMBED_SETTING = {
     "Embedding in public mode is supported in the free plan. To make your app public, please contact your administrator.",
   upgradeHeadingForInviteModal: () => "Public apps",
   upgradeSubheadingForInviteModal: () =>
-    "Make your app public by visiting the share settings, and easily embed your Appsmith app into legacy applications",
+    "Make your app public by visiting the share settings, and easily embed your Admin app app into legacy applications",
   privateAppsText: () => "Private apps",
   rampSubtextModal: () =>
-    "Embed private Appsmith apps and seamlessly authenticate users through SSO in our Enterprise Plan",
+    "Embed private Admin app apps and seamlessly authenticate users through SSO in our Enterprise Plan",
   rampSubtextSidebar: () =>
-    "To embed private Appsmith apps and seamlessly authenticate users through SSO, try our ",
+    "To embed private Admin app apps and seamlessly authenticate users through SSO, try our ",
   rampLinktext: () => "Try Enterprise",
   rampLinktextvariant2: () => "Enterprise Plan",
   upgradeContent: () => "Private embedding is now available in",
-  appsmithEnterpriseEdition: () => "Appsmith Enterprise Plan.",
+  appsmithEnterpriseEdition: () => "Admin app Enterprise Plan.",
   secondaryHeadingForAppSettings: () =>
-    "Make your app public to embed your Appsmith app into legacy applications",
+    "Make your app public to embed your Admin app app into legacy applications",
   secondaryHeading: () =>
     "Embedding in public mode is supported in the free plan. To make your app public, please contact your administrator.",
 };
@@ -1987,7 +1987,7 @@ export const SAVE_AND_RE_AUTHORIZE_BUTTON_TEXT = () => "Save & Re-Authorize";
 export const DISCARD_POPUP_DONT_SAVE_BUTTON_TEXT = () => "Don't save";
 export const GSHEET_AUTHORISED_FILE_IDS_KEY = () => "userAuthorizedSheetIds";
 export const GOOGLE_SHEETS_INFO_BANNER_MESSAGE = () =>
-  "Appsmith will require access to your google drive to access google sheets.";
+  "Admin app will require access to your google drive to access google sheets.";
 export const GOOGLE_SHEETS_AUTHORIZE_DATASOURCE = () => "Authorize datasource";
 export const GOOGLE_SHEETS_LEARN_MORE = () => "Learn more";
 export const DATASOURCE_SCHEMA_NOT_AVAILABLE = () => "Schema is not available";
@@ -2010,10 +2010,10 @@ export const GSHEET_SEARCH_PLACEHOLDER = () => "Search for spreadsheet";
 export const CONVERT = () => "Convert layout";
 export const BUILD_RESPONSIVE = () => "Build responsive apps";
 export const BUILD_RESPONSIVE_TEXT = () =>
-  "Appsmith will convert your application's UI to auto-layout, a new mode designed for building mobile-friendly apps in no time";
+  "Admin app will convert your application's UI to auto-layout, a new mode designed for building mobile-friendly apps in no time";
 export const BUILD_FIXED_LAYOUT = () => "Use fixed-layout";
 export const BUILD_FIXED_LAYOUT_TEXT = () =>
-  "Appsmith will convert your application’s UI to fixed layout, the default mode.";
+  "Admin app will convert your application’s UI to fixed layout, the default mode.";
 export const USE_SNAPSHOT = () => "Use snapshot";
 export const USE_SNAPSHOT_HEADER = () => "Use snapshot";
 export const DISCARD_SNAPSHOT_HEADER = () => "Discarding a snapshot";
@@ -2037,7 +2037,7 @@ export const CONVERSION_WARNING_TEXT = () =>
   "You might need to manually position some of the widgets your layout contains";
 export const CONVERSION_ERROR_HEADER = () => "Conversion failed";
 export const CONVERSION_ERROR = () =>
-  "Appsmith ran into a critical error while trying to convert to auto-layout";
+  "Admin app ran into a critical error while trying to convert to auto-layout";
 export const SEND_REPORT = () => "Send us a report";
 export const CONVERSION_ERROR_TEXT = () => "No changes were made to your app";
 export const DROPDOWN_LABEL_TEXT = () => "Target canvas size";
@@ -2185,7 +2185,7 @@ export const COMMUNITY_TEMPLATES = {
   tabTitle: () => "Showcase",
   cancel: () => "Cancel",
   publishSuccessPage: {
-    title: () => "Live on Appsmith community",
+    title: () => "Live on Admin app community",
     description: () =>
       "This application is live on community as a template for users to fork and remix.",
     viewTemplateButton: () => "View template",
@@ -2246,13 +2246,13 @@ export const COMMUNITY_TEMPLATES = {
   },
   modals: {
     unpublishedInfo: {
-      title: () => "Publish to Appsmith community",
+      title: () => "Publish to Admin app community",
       description: () =>
-        "Publish this app to Appsmith community for the public to view, fork, and remix.",
+        "Publish this app to Admin app community for the public to view, fork, and remix.",
       publishBtn: () => "Start publishing",
     },
     publishedInfo: {
-      title: () => "Live on Appsmith community!",
+      title: () => "Live on Admin app community!",
       description: () =>
         "This application is live on community as a template for users to fork and remix.",
       viewTemplate: () => "View template",
